@@ -1,70 +1,83 @@
-# Getting Started with Create React App
+# Vietnamese to English Translator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Flask web application for translating Vietnamese to English with voice input and text-to-speech using **Groq API** (super fast!).
 
-## Available Scripts
+## Setup
 
-In the project directory, you can run:
+1. Create virtual environment:
 
-### `npm start`
+```bash
+python -m venv venv
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+2. Activate virtual environment:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+# Windows
+venv\Scripts\activate
 
-### `npm test`
+# Linux/Mac
+source venv/bin/activate
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Install dependencies:
 
-### `npm run build`
+```bash
+pip install -r requirements.txt
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+4. Configure API key in `.env` file:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Get your free Groq API key at: https://console.groq.com/keys
 
-### `npm run eject`
+5. Run:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+python app.py
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+6. Open browser: `http://localhost:5000`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## ✨ Features
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- ✅ Auto-translate after typing
+- ✅ Voice input (Vietnamese)
+- ✅ Text-to-speech (English)
+- ✅ Adjustable speech speed (0.5x - 2x)
+- ✅ Auto-speak mode
+- ✅ Continuous mode
+- ✅ **SUPER FAST** translation with Groq (280-560 tokens/sec)
 
-## Learn More
+## 🤖 Recommended Models
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### **llama-3.3-70b-versatile** (Default - Best quality)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Speed: 280 tokens/sec
+- Price: $0.59/1M input, $0.79/1M output
+- Best for accurate translations
 
-### Code Splitting
+### **llama-3.1-8b-instant** (Fastest)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Speed: 560 tokens/sec (FASTEST!)
+- Price: $0.05/1M input, $0.08/1M output
+- Best for quick translations
 
-### Analyzing the Bundle Size
+### **qwen/qwen3-32b** (Good for Vietnamese)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- Speed: 400 tokens/sec
+- Price: $0.29/1M input, $0.59/1M output
+- Qwen models are optimized for Asian languages
 
-### Making a Progressive Web App
+To change model, edit `GROQ_MODEL` in `.env` file.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 🛠️ Tech Stack
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Backend:** Flask 3.0
+- **API:** Groq (OpenAI-compatible)
+- **Frontend:** Vanilla JavaScript
+- **Speech:** Web Speech API

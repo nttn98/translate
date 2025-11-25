@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vietnamese to English Translator</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #667eea;
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+      }
+
+      .status-bar {
+        background: #f3f4f6;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 500;
+      }
+
+      .section {
+        margin-bottom: 30px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 120px;
+        transition: border-color 0.3s;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .output-section {
+        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+      }
+
+      .output-text {
+        font-size: 1.1rem;
+        min-height: 100px;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .btn {
+        padding: 10px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        color: white;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary {
+        background: #667eea;
+      }
+
+      .btn-primary:hover {
+        background: #5568d3;
+      }
+
+      .btn-success {
+        background: #10b981;
+      }
+
+      .btn-success:hover {
+        background: #059669;
+      }
+
+      .btn-danger {
+        background: #ef4444;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      .btn-speaking {
+        background: #f97316;
+      }
+
+      .btn-listening {
+        background: #ef4444;
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .settings {
+        background: #f9fafb;
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+      }
+
+      .settings h3 {
+        margin-bottom: 20px;
+        font-size: 1.1rem;
+      }
+
+      .setting-item {
+        margin-bottom: 20px;
+      }
+
+      .setting-item label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: #d1d5db;
+        outline: none;
+      }
+
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+        cursor: pointer;
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      .features {
+        background: #dbeafe;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 4px solid #3b82f6;
+      }
+
+      .features strong {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
+
+      .features ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .features li {
+        padding: 5px 0;
+        padding-left: 20px;
+        position: relative;
+      }
+
+      .features li:before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Vietnamese to English Translator</h1>
+
+      <div class="status-bar" id="status">Ready</div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">Vietnamese Input</span>
+          <button
+            class="btn btn-primary"
+            id="voiceBtn"
+            onclick="handleVoiceInput()"
+          >
+            🎤 Voice Input
+          </button>
+        </div>
+        <textarea
+          id="inputText"
+          placeholder="Type Vietnamese here..."
+        ></textarea>
+      </div>
+
+      <div class="output-section">
+        <div class="section-header">
+          <span class="section-title">English Translation</span>
+        </div>
+        <div class="output-text" id="outputText">
+          Translation will appear here...
+        </div>
+        <div class="button-group">
+          <button class="btn btn-success" id="speakBtn" onclick="handleSpeak()">
+            🔊 Speak
+          </button>
+          <button class="btn btn-danger" onclick="handleStop()">⏹️ Stop</button>
+        </div>
+      </div>
+
+      <div class="settings">
+        <h3>Settings</h3>
+
+        <div class="setting-item">
+          <label>Speech Speed: <span id="speedValue">1.0x</span></label>
+          <input
+            type="range"
+            id="speedSlider"
+            min="0.5"
+            max="2"
+            step="0.1"
+            value="1.0"
+            oninput="updateSpeed(this.value)"
+          />
+        </div>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="autoSpeak" checked />
+          Auto-speak after translation
+        </label>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="continuous" checked />
+          Continuous mode (only new text)
+        </label>
+      </div>
+
+      <div class="features">
+        <strong>✨ Features:</strong>
+        <ul>
+          <li>Auto-translates 1 second after typing</li>
+          <li>Auto-speak with continuous mode (only reads new content)</li>
+          <li>Voice input support for Vietnamese</li>
+          <li>Adjustable speech speed (0.5x - 2x)</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      let typingTimer;
+      let lastText = "";
+      let lastPosition = 0;
+      let isSpeaking = false;
+      let isListening = false;
+      let recognition = null;
+
+      // Initialize speech recognition
+      if (
+        "webkitSpeechRecognition" in window ||
+        "SpeechRecognition" in window
+      ) {
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = "vi-VN";
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          document.getElementById("inputText").value = transcript;
+          isListening = false;
+          updateStatus("Ready");
+          document.getElementById("voiceBtn").className = "btn btn-primary";
+          document.getElementById("voiceBtn").textContent = "🎤 Voice Input";
+          translateText(transcript);
+        };
+
+        recognition.onerror = () => {
+          isListening = false;
+          updateStatus("Error");
+          document.getElementById("voiceBtn").className = "btn btn-primary";
+          document.getElementById("voiceBtn").textContent = "🎤 Voice Input";
+        };
+
+        recognition.onend = () => {
+          isListening = false;
+          document.getElementById("voiceBtn").className = "btn btn-primary";
+          document.getElementById("voiceBtn").textContent = "🎤 Voice Input";
+        };
+      }
+
+      // Handle input changes
+      document.getElementById("inputText").addEventListener("input", (e) => {
+        const text = e.target.value;
+        clearTimeout(typingTimer);
+
+        if (text.trim()) {
+          updateStatus("Typing...");
+          typingTimer = setTimeout(() => {
+            translateText(text);
+          }, 1000);
+        } else {
+          document.getElementById("outputText").textContent =
+            "Translation will appear here...";
+          lastText = "";
+          lastPosition = 0;
+          updateStatus("Ready");
+        }
+      });
+
+      function updateStatus(status) {
+        document.getElementById("status").textContent = status;
+      }
+
+      function updateSpeed(value) {
+        document.getElementById("speedValue").textContent =
+          parseFloat(value).toFixed(1) + "x";
+      }
+
+      async function translateText(text) {
+        if (!text.trim()) return;
+
+        updateStatus("Translating...");
+
+        try {
+          const response = await fetch("/translate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: text }),
+          });
+
+          const data = await response.json();
+
+          if (data.translation) {
+            document.getElementById("outputText").textContent =
+              data.translation;
+            lastText = data.translation;
+            updateStatus("Ready");
+
+            if (document.getElementById("autoSpeak").checked) {
+              setTimeout(() => speakText(data.translation), 300);
+            }
+          } else {
+            document.getElementById("outputText").textContent =
+              "Translation failed: " + (data.error || "Unknown error");
+            updateStatus("Error");
+          }
+        } catch (error) {
+          console.error("Translation error:", error);
+          document.getElementById("outputText").textContent =
+            "Translation failed. Please check your connection.";
+          updateStatus("Error");
+        }
+      }
+
+      function speakText(text) {
+        if (!text || text === "Translation will appear here...") return;
+
+        let textToSpeak = text;
+
+        if (document.getElementById("continuous").checked && lastPosition > 0) {
+          const previousPart = lastText.substring(0, lastPosition);
+          if (text.indexOf(previousPart) === 0) {
+            textToSpeak = text.substring(lastPosition).trim();
+            if (!textToSpeak) return;
+          }
+        }
+
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.lang = "en-US";
+        utterance.rate = parseFloat(
+          document.getElementById("speedSlider").value
+        );
+
+        utterance.onstart = () => {
+          isSpeaking = true;
+          updateStatus("Speaking...");
+          document.getElementById("speakBtn").className = "btn btn-speaking";
+        };
+
+        utterance.onend = () => {
+          isSpeaking = false;
+          updateStatus("Ready");
+          document.getElementById("speakBtn").className = "btn btn-success";
+          lastPosition = text.length;
+        };
+
+        utterance.onerror = () => {
+          isSpeaking = false;
+          updateStatus("Ready");
+          document.getElementById("speakBtn").className = "btn btn-success";
+        };
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function handleVoiceInput() {
+        if (!recognition) {
+          alert("Speech recognition not supported. Use Chrome or Edge.");
+          return;
+        }
+
+        if (isListening) {
+          recognition.stop();
+        } else {
+          isListening = true;
+          updateStatus("Listening...");
+          document.getElementById("voiceBtn").className = "btn btn-listening";
+          document.getElementById("voiceBtn").textContent = "🎤 Listening...";
+          recognition.start();
+        }
+      }
+
+      function handleSpeak() {
+        if (lastText) {
+          lastPosition = 0;
+          speakText(lastText);
+        }
+      }
+
+      function handleStop() {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        updateStatus("Ready");
+        document.getElementById("speakBtn").className = "btn btn-success";
+      }
+    </script>
+  </body>
+</html>
