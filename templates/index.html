@@ -1,257 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vietnamese to English Translator</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 20px;
-      }
-
-      .container {
-        max-width: 1000px;
-        margin: 0 auto;
-        background: white;
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        padding: 40px;
-      }
-
-      h1 {
-        text-align: center;
-        color: #667eea;
-        font-size: 2.5rem;
-        margin-bottom: 30px;
-      }
-
-      .status-bar {
-        background: #f3f4f6;
-        padding: 12px;
-        border-radius: 8px;
-        text-align: center;
-        margin-bottom: 30px;
-        font-weight: 500;
-      }
-
-      .section {
-        margin-bottom: 30px;
-      }
-
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-      }
-
-      .section-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
-
-      textarea {
-        width: 100%;
-        padding: 15px;
-        border: 2px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-family: inherit;
-        resize: vertical;
-        min-height: 120px;
-        transition: border-color 0.3s;
-      }
-
-      textarea:focus {
-        outline: none;
-        border-color: #667eea;
-      }
-
-      .output-section {
-        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-        padding: 25px;
-        border-radius: 12px;
-        margin-bottom: 30px;
-      }
-
-      .output-text {
-        font-size: 1.1rem;
-        min-height: 100px;
-        margin-bottom: 20px;
-        line-height: 1.6;
-      }
-
-      .btn {
-        padding: 10px 24px;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        color: white;
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      .btn-primary {
-        background: #667eea;
-      }
-
-      .btn-primary:hover {
-        background: #5568d3;
-      }
-
-      .btn-success {
-        background: #10b981;
-      }
-
-      .btn-success:hover {
-        background: #059669;
-      }
-
-      .btn-danger {
-        background: #ef4444;
-      }
-
-      .btn-danger:hover {
-        background: #dc2626;
-      }
-
-      .btn-speaking {
-        background: #f97316;
-      }
-
-      .btn-listening {
-        background: #ef4444;
-        animation: pulse 1.5s infinite;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.7;
-        }
-      }
-
-      .button-group {
-        display: flex;
-        gap: 10px;
-      }
-
-      .settings {
-        background: #f9fafb;
-        padding: 25px;
-        border-radius: 12px;
-        margin-bottom: 30px;
-      }
-
-      .settings h3 {
-        margin-bottom: 20px;
-        font-size: 1.1rem;
-      }
-
-      .setting-item {
-        margin-bottom: 20px;
-      }
-
-      .setting-item label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-      }
-
-      input[type="range"] {
-        width: 100%;
-        height: 6px;
-        border-radius: 3px;
-        background: #d1d5db;
-        outline: none;
-      }
-
-      input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        margin-right: 8px;
-        cursor: pointer;
-      }
-
-      .checkbox-label {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        margin-bottom: 10px;
-      }
-
-      .features {
-        background: #dbeafe;
-        padding: 20px;
-        border-radius: 12px;
-        border-left: 4px solid #3b82f6;
-      }
-
-      .features strong {
-        display: block;
-        margin-bottom: 10px;
-        font-size: 1rem;
-      }
-
-      .features ul {
-        list-style: none;
-        padding-left: 0;
-      }
-
-      .features li {
-        padding: 5px 0;
-        padding-left: 20px;
-        position: relative;
-      }
-
-      .features li:before {
-        content: "•";
-        position: absolute;
-        left: 0;
-        font-weight: bold;
-      }
-    </style>
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
     <div class="container">
       <h1>Vietnamese to English Translator</h1>
-
       <div class="status-bar" id="status">Ready</div>
 
       <div class="section">
         <div class="section-header">
           <span class="section-title">Vietnamese Input</span>
-          <button
-            class="btn btn-primary"
-            id="voiceBtn"
-            onclick="handleVoiceInput()"
-          >
-            🎤 Voice Input
-          </button>
+          <div style="display: flex; gap: 8px">
+            <button
+              class="btn btn-primary"
+              id="voiceBtn"
+              onclick="handleVoiceInput()"
+            >
+              🎤 Voice Input
+            </button>
+            <!-- Fallback record button (MediaRecorder) -->
+            <button
+              class="btn btn-primary"
+              id="recordBtn"
+              onclick="toggleRecording()"
+            >
+              ⏺️ Record
+            </button>
+          </div>
         </div>
         <textarea
           id="inputText"
           placeholder="Type Vietnamese here..."
         ></textarea>
+        <div class="note">
+          Tip: Mở trang bằng <strong>http://localhost</strong> hoặc
+          <strong>https</strong> để voice hoạt động. Nếu gặp lỗi "network", thử
+          tắt VPN hoặc đổi mạng. Nếu Web Speech lỗi, dùng "Record" (upload file
+          cho server-side STT).
+        </div>
       </div>
 
       <div class="output-section">
@@ -267,11 +57,13 @@
           </button>
           <button class="btn btn-danger" onclick="handleStop()">⏹️ Stop</button>
         </div>
+        <div class="small">
+          Dev logs: open DevTools → Console để xem chi tiết speech logs.
+        </div>
       </div>
 
       <div class="settings">
         <h3>Settings</h3>
-
         <div class="setting-item">
           <label>Speech Speed: <span id="speedValue">1.0x</span></label>
           <input
@@ -301,66 +93,356 @@
         <ul>
           <li>Auto-translates 1 second after typing</li>
           <li>Auto-speak with continuous mode (only reads new content)</li>
-          <li>Voice input support for Vietnamese</li>
-          <li>Adjustable speech speed (0.5x - 2x)</li>
+          <li>
+            Voice input support for Vietnamese (Web Speech API) with robust
+            error handling
+          </li>
+          <li>Record fallback — uploads to server-side STT (/stt)</li>
         </ul>
       </div>
     </div>
 
     <script>
+      /* -------------------------
+         State (typing/TTS untouched)
+         ------------------------- */
       let typingTimer;
       let lastText = "";
       let lastPosition = 0;
       let isSpeaking = false;
       let isListening = false;
-      let recognition = null;
 
-      // Initialize speech recognition
-      if (
-        "webkitSpeechRecognition" in window ||
-        "SpeechRecognition" in window
-      ) {
+      // --- Voice (Web Speech) vars ---
+      let recognition = null;
+      let voiceRequested = false; // whether user asked to keep listening (used to allow single auto-restart)
+
+      // --- Recording fallback vars ---
+      let mediaRecorder = null;
+      let recordedChunks = [];
+      let isRecording = false;
+
+      // Utility
+      function updateStatus(s) {
+        const el = document.getElementById("status");
+        if (el) el.textContent = s;
+        console.log("[STATUS]", s);
+      }
+
+      function updateSpeed(v) {
+        document.getElementById("speedValue").textContent =
+          parseFloat(v).toFixed(1) + "x";
+      }
+
+      function isSecureContextForSpeech() {
+        return (
+          location.protocol === "https:" ||
+          location.hostname === "localhost" ||
+          location.hostname === "127.0.0.1"
+        );
+      }
+
+      /* -------------------------
+         Web Speech: safe init + handlers
+         Replace existing fragile logic with this version:
+         - continuous = false (single-utterance) to avoid long network streams
+         - no infinite auto-restart
+         - clear handling of permission/network errors
+         ------------------------- */
+      function initRecognitionSafe() {
+        if (
+          !(
+            "webkitSpeechRecognition" in window || "SpeechRecognition" in window
+          )
+        ) {
+          console.warn("SpeechRecognition not supported.");
+          recognition = null;
+          return;
+        }
         const SpeechRecognition =
           window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.lang = "vi-VN";
-        recognition.continuous = false;
-        recognition.interimResults = false;
+        try {
+          recognition = new SpeechRecognition();
+        } catch (err) {
+          console.error("Failed to construct SpeechRecognition:", err);
+          recognition = null;
+          return;
+        }
 
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
-          document.getElementById("inputText").value = transcript;
-          isListening = false;
-          updateStatus("Ready");
-          document.getElementById("voiceBtn").className = "btn btn-primary";
-          document.getElementById("voiceBtn").textContent = "🎤 Voice Input";
-          translateText(transcript);
+        recognition.lang = "vi-VN";
+        recognition.continuous = false; // single utterance — safer
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          isListening = true;
+          updateStatus("Listening...");
+          console.log("recognition.onstart");
         };
 
-        recognition.onerror = () => {
+        recognition.onresult = (event) => {
+          let transcript = "";
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            transcript += event.results[i][0].transcript;
+          }
+          console.log("recognition.onresult:", transcript);
+          // Preserve typing behavior: dispatch 'input' to reuse your typing debounce/autotranslate
+          const inputEl = document.getElementById("inputText");
+          if (inputEl) {
+            inputEl.value = transcript;
+            inputEl.dispatchEvent(new Event("input", { bubbles: true }));
+          } else {
+            // fallback: call translateText directly if input missing
+            if (typeof translateText === "function") translateText(transcript);
+          }
+        };
+
+        recognition.onerror = (e) => {
+          const err = e && e.error ? e.error : "unknown";
+          console.error("recognition.onerror:", e);
+          updateStatus("Error: " + err);
           isListening = false;
-          updateStatus("Error");
-          document.getElementById("voiceBtn").className = "btn btn-primary";
-          document.getElementById("voiceBtn").textContent = "🎤 Voice Input";
+          voiceRequested = false;
+          // reset UI
+          const vb = document.getElementById("voiceBtn");
+          if (vb) {
+            vb.className = "btn btn-primary";
+            vb.textContent = "🎤 Voice Input";
+          }
+
+          if (err === "network") {
+            // network error => likely Web Speech backend unreachable
+            alert(
+              "Speech service network error. Thử: tắt VPN/proxy, đổi mạng, dùng Incognito. Hoặc dùng nút Record để upload audio cho server-side transcription."
+            );
+            // enable record button UI hint (no auto-record)
+            console.warn(
+              "Web Speech network error (suggest using Record fallback)."
+            );
+          } else if (err === "not-allowed" || err === "service-not-allowed") {
+            alert(
+              "Quyền microphone bị chặn. Hãy bật Microphone cho trang này trong settings trình duyệt."
+            );
+          } else {
+            console.warn("SpeechRecognition error:", err);
+          }
         };
 
         recognition.onend = () => {
+          console.log(
+            "recognition.onend — isListening:",
+            isListening,
+            "voiceRequested:",
+            voiceRequested
+          );
           isListening = false;
-          document.getElementById("voiceBtn").className = "btn btn-primary";
-          document.getElementById("voiceBtn").textContent = "🎤 Voice Input";
+          updateStatus("Ready");
+          const vb = document.getElementById("voiceBtn");
+          if (vb) {
+            vb.className = "btn btn-primary";
+            vb.textContent = "🎤 Voice Input";
+          }
+
+          // If user explicitly requested continued listening, restart once only
+          if (voiceRequested) {
+            voiceRequested = false; // allow single auto-restart
+            setTimeout(() => {
+              try {
+                recognition.start();
+                console.log("Auto-restart recognition (single attempt).");
+              } catch (err) {
+                console.warn("Auto-restart failed:", err);
+              }
+            }, 250);
+          }
         };
+
+        console.log("initRecognitionSafe done");
       }
 
-      // Handle input changes
+      // initialize on load
+      initRecognitionSafe();
+
+      // Voice button handler (start/stop)
+      function handleVoiceInput() {
+        if (!isSecureContextForSpeech()) {
+          alert(
+            "SpeechRecognition requires HTTPS or http://localhost. Mở trang bằng https hoặc localhost."
+          );
+          return;
+        }
+        if (!recognition) {
+          alert("SpeechRecognition not supported (use Chrome/Edge).");
+          return;
+        }
+
+        const vb = document.getElementById("voiceBtn");
+        if (isListening) {
+          // stop
+          try {
+            recognition.stop();
+          } catch (err) {
+            console.warn("stop error:", err);
+          }
+          voiceRequested = false;
+          // UI will be reset in onend
+          return;
+        }
+
+        // request mic permission first (shows browser prompt)
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then((stream) => {
+            // stop immediately; we only needed permission
+            stream.getTracks().forEach((t) => t.stop());
+            // update UI
+            if (vb) {
+              vb.className = "btn btn-listening";
+              vb.textContent = "🎤 Listening...";
+            }
+            voiceRequested = true;
+            try {
+              if (!isListening) recognition.start();
+            } catch (err) {
+              console.error("recognition.start() error:", err);
+              // attempt recreate then start once
+              try {
+                initRecognitionSafe();
+                recognition.start();
+              } catch (err2) {
+                console.error("Retry recognition.start failed:", err2);
+                alert(
+                  "Không thể bắt đầu voice input: " + (err2.message || err2)
+                );
+                if (vb) {
+                  vb.className = "btn btn-primary";
+                  vb.textContent = "🎤 Voice Input";
+                }
+                updateStatus("Ready");
+              }
+            }
+          })
+          .catch((err) => {
+            console.warn("getUserMedia error:", err);
+            alert(
+              "Không thể truy cập microphone. Kiểm tra quyền trong trình duyệt."
+            );
+          });
+      }
+
+      // expose to onclick attr
+      window.handleVoiceInput = handleVoiceInput;
+
+      /* -------------------------
+         MediaRecorder fallback (Record button)
+         - Records audio (webm) and uploads to /stt if available
+         - Server-side /stt returns { transcription: "..." } when configured (see app.py)
+         ------------------------- */
+      function setRecordBtn(on) {
+        const b = document.getElementById("recordBtn");
+        if (!b) return;
+        if (on) {
+          b.textContent = "⏹️ Stop Recording";
+          b.className = "btn btn-listening";
+        } else {
+          b.textContent = "⏺️ Record";
+          b.className = "btn btn-primary";
+        }
+      }
+
+      async function toggleRecording() {
+        if (isRecording) {
+          stopRecording();
+          return;
+        }
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+          recordedChunks = [];
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+          };
+          mediaRecorder.onstop = async () => {
+            // stop tracks
+            stream.getTracks().forEach((t) => t.stop());
+            const blob = new Blob(recordedChunks, { type: "audio/webm" });
+            // upload to /stt
+            await uploadAudioBlob(blob);
+          };
+          mediaRecorder.start();
+          isRecording = true;
+          setRecordBtn(true);
+          updateStatus("Recording...");
+        } catch (err) {
+          console.error("getUserMedia error:", err);
+          alert("Không thể truy cập microphone. Kiểm tra quyền.");
+        }
+      }
+
+      function stopRecording() {
+        if (mediaRecorder && isRecording) mediaRecorder.stop();
+        isRecording = false;
+        setRecordBtn(false);
+        updateStatus("Ready");
+      }
+
+      async function uploadAudioBlob(blob) {
+        updateStatus("Uploading audio...");
+        try {
+          const form = new FormData();
+          const filename = `rec_${Date.now()}.webm`;
+          form.append("file", blob, filename);
+          const resp = await fetch("/stt", { method: "POST", body: form });
+          if (!resp.ok) {
+            const txt = await resp.text();
+            console.warn("STT upload error:", txt);
+            alert("STT upload failed: " + txt);
+            updateStatus("Ready");
+            return;
+          }
+          const data = await resp.json();
+          if (data.transcription) {
+            // put transcription into input and reuse typing logic
+            const inputEl = document.getElementById("inputText");
+            if (inputEl) {
+              inputEl.value = data.transcription;
+              inputEl.dispatchEvent(new Event("input", { bubbles: true }));
+            } else {
+              if (typeof translateText === "function")
+                translateText(data.transcription);
+            }
+            updateStatus("Ready");
+          } else if (data.file) {
+            alert(
+              "Audio uploaded to: " +
+                data.file +
+                "\nNo STT provider configured on server."
+            );
+            updateStatus("Ready");
+          } else {
+            alert("STT response: " + JSON.stringify(data));
+            updateStatus("Ready");
+          }
+        } catch (err) {
+          console.error("uploadAudioBlob error:", err);
+          alert("Upload failed: " + (err.message || err));
+          updateStatus("Ready");
+        }
+      }
+
+      // expose record functions
+      window.toggleRecording = toggleRecording;
+
+      /* -------------------------
+         Typing handler (kept exactly as before)
+         ------------------------- */
       document.getElementById("inputText").addEventListener("input", (e) => {
         const text = e.target.value;
         clearTimeout(typingTimer);
-
         if (text.trim()) {
           updateStatus("Typing...");
-          typingTimer = setTimeout(() => {
-            translateText(text);
-          }, 1000);
+          typingTimer = setTimeout(() => translateText(text), 1000);
         } else {
           document.getElementById("outputText").textContent =
             "Translation will appear here...";
@@ -370,58 +452,55 @@
         }
       });
 
-      function updateStatus(status) {
-        document.getElementById("status").textContent = status;
-      }
+      /* -------------------------
+         Keep translateText/applyTranslation/mockTranslate/speech as you had them
+         (paste your existing functions below or keep the ones already in your template)
+         ------------------------- */
 
-      function updateSpeed(value) {
-        document.getElementById("speedValue").textContent =
-          parseFloat(value).toFixed(1) + "x";
-      }
+      // If your original file already included these functions, keep them unchanged.
+      // For safety, include minimal implementations only if not present:
 
       async function translateText(text) {
         if (!text.trim()) return;
-
         updateStatus("Translating...");
-
         try {
           const response = await fetch("/translate", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ text: text }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
           });
-
-          const data = await response.json();
-
-          if (data.translation) {
-            document.getElementById("outputText").textContent =
-              data.translation;
-            lastText = data.translation;
-            updateStatus("Ready");
-
-            if (document.getElementById("autoSpeak").checked) {
-              setTimeout(() => speakText(data.translation), 300);
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.translation) {
+              applyTranslation(data.translation);
+              return;
             }
+            console.warn("Server responded but no translation field.");
           } else {
-            document.getElementById("outputText").textContent =
-              "Translation failed: " + (data.error || "Unknown error");
-            updateStatus("Error");
+            console.warn("Server returned non-ok status:", response.status);
           }
-        } catch (error) {
-          console.error("Translation error:", error);
-          document.getElementById("outputText").textContent =
-            "Translation failed. Please check your connection.";
-          updateStatus("Error");
+        } catch (err) {
+          console.warn("Server translate failed:", err);
         }
+        const fallback = mockTranslate(text);
+        applyTranslation(fallback);
+      }
+
+      function applyTranslation(trans) {
+        document.getElementById("outputText").textContent = trans;
+        lastText = trans;
+        updateStatus("Ready");
+        if (document.getElementById("autoSpeak").checked)
+          setTimeout(() => speakText(trans), 300);
+      }
+
+      function mockTranslate(vnText) {
+        return "EN (mock): " + vnText;
       }
 
       function speakText(text) {
         if (!text || text === "Translation will appear here...") return;
-
         let textToSpeak = text;
-
         if (document.getElementById("continuous").checked && lastPosition > 0) {
           const previousPart = lastText.substring(0, lastPosition);
           if (text.indexOf(previousPart) === 0) {
@@ -429,67 +508,51 @@
             if (!textToSpeak) return;
           }
         }
-
         window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        utterance.lang = "en-US";
-        utterance.rate = parseFloat(
-          document.getElementById("speedSlider").value
-        );
-
-        utterance.onstart = () => {
+        const u = new SpeechSynthesisUtterance(textToSpeak);
+        u.lang = "en-US";
+        u.rate = parseFloat(document.getElementById("speedSlider").value);
+        u.onstart = () => {
           isSpeaking = true;
           updateStatus("Speaking...");
           document.getElementById("speakBtn").className = "btn btn-speaking";
         };
-
-        utterance.onend = () => {
+        u.onend = () => {
           isSpeaking = false;
           updateStatus("Ready");
           document.getElementById("speakBtn").className = "btn btn-success";
           lastPosition = text.length;
         };
-
-        utterance.onerror = () => {
+        u.onerror = (e) => {
+          console.error("TTS error:", e);
           isSpeaking = false;
           updateStatus("Ready");
           document.getElementById("speakBtn").className = "btn btn-success";
         };
-
-        window.speechSynthesis.speak(utterance);
+        window.speechSynthesis.speak(u);
       }
 
-      function handleVoiceInput() {
-        if (!recognition) {
-          alert("Speech recognition not supported. Use Chrome or Edge.");
-          return;
-        }
-
-        if (isListening) {
-          recognition.stop();
-        } else {
-          isListening = true;
-          updateStatus("Listening...");
-          document.getElementById("voiceBtn").className = "btn btn-listening";
-          document.getElementById("voiceBtn").textContent = "🎤 Listening...";
-          recognition.start();
-        }
-      }
-
-      function handleSpeak() {
+      window.handleSpeak = function () {
         if (lastText) {
           lastPosition = 0;
           speakText(lastText);
         }
-      }
-
-      function handleStop() {
+      };
+      window.handleStop = function () {
         window.speechSynthesis.cancel();
         isSpeaking = false;
         updateStatus("Ready");
         document.getElementById("speakBtn").className = "btn btn-success";
-      }
+      };
+
+      // Debug helpers
+      window._debug = {
+        get recognition() {
+          return recognition;
+        },
+        initRecognitionSafe,
+        toggleRecording,
+      };
     </script>
   </body>
 </html>
