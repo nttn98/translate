@@ -67,12 +67,6 @@ python app.py
 - Price: $0.05/1M input, $0.08/1M output
 - Best for quick translations
 
-### **qwen/qwen3-32b** (Good for Vietnamese)
-
-- Speed: 400 tokens/sec
-- Price: $0.29/1M input, $0.59/1M output
-- Qwen models are optimized for Asian languages
-
 To change model, edit `GROQ_MODEL` in `.env` file.
 
 ## 🛠️ Tech Stack
