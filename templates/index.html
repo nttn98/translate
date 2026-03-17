@@ -3,114 +3,191 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vietnamese to English Translator</title>
+    <title>My Translator - Realtime VI to EN</title>
     <link rel="stylesheet" href="/static/style.css" />
   </head>
-
   <body>
-    <div class="container">
-      <h1>Vietnamese → English Translator</h1>
+    <div class="ambient-bg"></div>
 
-      <div class="status-bar" id="status">Ready</div>
-
-      <!-- INPUT -->
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">Vietnamese Input</span>
-          <div style="display: flex; gap: 8px">
-            <button
-              class="btn btn-primary"
-              id="voiceBtn"
-              onclick="toggleVoiceInput()"
-            >
-              🎤 Start Listening
-            </button>
-          </div>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Realtime Speech Translation</p>
+          <h1>My Translator</h1>
         </div>
+        <div class="status-pill" id="status">Ready</div>
+      </header>
 
+      <section class="panel input-panel">
+        <div class="panel-head">
+          <h2>Vietnamese Input</h2>
+          <button
+            class="btn btn-primary"
+            id="voiceBtn"
+            onclick="toggleVoiceInput()"
+          >
+            Start Listening
+          </button>
+        </div>
         <textarea
           id="inputText"
-          placeholder="Type Vietnamese here..."
+          placeholder="Type or speak Vietnamese..."
         ></textarea>
-      </div>
+        <p class="hint">
+          Tip: app translates the newest spoken or typed segment to keep latency
+          low.
+        </p>
+      </section>
 
-      <!-- DETECTED SPEECH -->
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">Detected Vietnamese (from mic)</span>
+      <section class="grid-two">
+        <article class="panel">
+          <div class="panel-head compact">
+            <h3>Detected Speech</h3>
+          </div>
+          <div class="box" id="detectedText">No speech yet.</div>
+        </article>
+
+        <article class="panel output-panel">
+          <div class="panel-head compact">
+            <h3>English Translation</h3>
+          </div>
+          <div class="box" id="outputText">Translation will appear here...</div>
+          <div class="button-row">
+            <button
+              class="btn btn-success"
+              id="speakBtn"
+              onclick="handleSpeak()"
+            >
+              Speak
+            </button>
+            <button class="btn btn-danger" onclick="handleStop()">Stop</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel settings-wrap">
+        <div class="panel-head compact">
+          <h3>Settings</h3>
         </div>
-        <div class="box" id="detectedText">—</div>
-      </div>
 
-      <!-- OUTPUT -->
-      <div class="output-section">
-        <div class="section-header">
-          <span class="section-title">English Translation</span>
-        </div>
-        <div class="box" id="outputText">Translation will appear here...</div>
-
-        <div class="button-group">
-          <button class="btn btn-success" id="speakBtn" onclick="handleSpeak()">
-            🔊 Speak
+        <div class="tabs" role="tablist">
+          <button
+            class="tab active"
+            data-tab="general"
+            onclick="switchTab('general')"
+          >
+            General
           </button>
-          <button class="btn btn-danger" onclick="handleStop()">⏹️ Stop</button>
-        </div>
-      </div>
-
-      <!-- SETTINGS -->
-      <div class="settings">
-        <h3>Settings</h3>
-        <div class="setting-item">
-          <label>Speech Speed: <span id="speedValue">1.0x</span></label>
-          <input
-            type="range"
-            id="speedSlider"
-            min="0.5"
-            max="2"
-            step="0.1"
-            value="1.0"
-            oninput="updateSpeed(this.value)"
-          />
+          <button class="tab" data-tab="tts" onclick="switchTab('tts')">
+            TTS
+          </button>
         </div>
 
-        <label class="checkbox-label">
-          <input type="checkbox" id="autoSpeak" checked /> Auto-speak after
-          translation
-        </label>
+        <div class="tab-body active" id="tab-general">
+          <label class="field">
+            <span>Speech Speed: <strong id="speedValue">1.0x</strong></span>
+            <input
+              type="range"
+              id="speedSlider"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value="1.0"
+              oninput="updateSpeed(this.value)"
+            />
+          </label>
 
-        <label class="checkbox-label">
-          <input type="checkbox" id="continuous" checked /> Continuous mode
-          (only new text)
-        </label>
-      </div>
-    </div>
+          <label class="check">
+            <input type="checkbox" id="autoSpeak" checked />
+            <span>Auto speak after translation</span>
+          </label>
+
+          <label class="check">
+            <input type="checkbox" id="continuous" checked />
+            <span>Continuous mode (translate only newest chunk)</span>
+          </label>
+        </div>
+
+        <div class="tab-body" id="tab-tts">
+          <label class="field">
+            <span>TTS Provider</span>
+            <select id="ttsProvider" onchange="onProviderChange()">
+              <option value="web">Web Speech (browser)</option>
+              <option value="edge">Edge TTS (server)</option>
+            </select>
+          </label>
+
+          <label class="field" id="edgeVoiceField">
+            <span>Edge Voice</span>
+            <select id="edgeVoice">
+              <option value="en-US-AriaNeural">Aria (US Female)</option>
+              <option value="en-US-GuyNeural">Guy (US Male)</option>
+              <option value="en-GB-SoniaNeural">Sonia (UK Female)</option>
+              <option value="en-GB-RyanNeural">Ryan (UK Male)</option>
+            </select>
+          </label>
+
+          <p class="hint" id="providerHint">
+            Web Speech runs locally in browser. Edge TTS gives more natural
+            neural voice.
+          </p>
+        </div>
+      </section>
+    </main>
 
     <script>
       let recognition = null;
       let isListening = false;
       let isFromVoice = false;
 
-      // STT state
       let fullVoiceTranscript = "";
       let processedVoiceTranscript = "";
-      let voiceSilenceTimer = null; // 1s im lặng
+      let voiceSilenceTimer = null;
 
-      // TTS state: chỉ đọc từng chunk, không cộng dồn để diff nữa
-      let lastTranslation = ""; // đoạn tiếng Anh mới nhất (chunk cuối cùng)
-
-      // Typing state: để lấy phần Vietnamese mới thêm (suffix)
+      let lastTranslation = "";
       let prevInputVi = "";
-
-      // debounce typing
       let typingTimer = null;
 
-      function updateStatus(s) {
-        document.getElementById("status").textContent = s;
+      let ttsAudio = null;
+      let ttsAudioUrl = "";
+
+      function updateStatus(message) {
+        document.getElementById("status").textContent = message;
       }
 
-      function updateSpeed(v) {
+      function updateSpeed(value) {
         document.getElementById("speedValue").textContent =
-          parseFloat(v).toFixed(1) + "x";
+          parseFloat(value).toFixed(1) + "x";
+      }
+
+      function switchTab(tab) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-body")
+          .forEach((el) => el.classList.remove("active"));
+
+        document
+          .querySelector(`.tab[data-tab='${tab}']`)
+          .classList.add("active");
+        document.getElementById(`tab-${tab}`).classList.add("active");
+      }
+
+      function onProviderChange() {
+        const provider = document.getElementById("ttsProvider").value;
+        const edgeField = document.getElementById("edgeVoiceField");
+        const hint = document.getElementById("providerHint");
+
+        if (provider === "edge") {
+          edgeField.style.display = "flex";
+          hint.textContent =
+            "Edge TTS uses server-side neural voices (requires edge-tts package).";
+        } else {
+          edgeField.style.display = "none";
+          hint.textContent =
+            "Web Speech runs locally in browser. Edge TTS gives more natural neural voice.";
+        }
       }
 
       function isEnglishSentence(text) {
@@ -121,7 +198,6 @@
         return letters.length >= 3 && !hasViet;
       }
 
-      // lấy độ dài prefix chung giữa 2 chuỗi (dùng cho typing)
       function longestCommonPrefixLen(a, b) {
         const max = Math.min(a.length, b.length);
         let i = 0;
@@ -129,24 +205,102 @@
         return i;
       }
 
-      // ------------- TTS: chỉ đọc đúng đoạn text đưa vào, không tái sử dụng gì -------------
-      function speakText(text) {
-        if (!text) return;
+      function cleanupAudioUrl() {
+        if (ttsAudioUrl) {
+          URL.revokeObjectURL(ttsAudioUrl);
+          ttsAudioUrl = "";
+        }
+      }
+
+      function stopAllSpeech() {
         window.speechSynthesis.cancel();
+        if (ttsAudio) {
+          ttsAudio.pause();
+          ttsAudio.currentTime = 0;
+          ttsAudio = null;
+        }
+        cleanupAudioUrl();
+        document.getElementById("speakBtn").className = "btn btn-success";
+      }
+
+      function speakWithWebSpeech(text) {
+        stopAllSpeech();
         const u = new SpeechSynthesisUtterance(text);
         u.lang = "en-US";
         u.rate = parseFloat(document.getElementById("speedSlider").value);
 
         u.onstart = () => {
-          updateStatus("Speaking...");
+          updateStatus("Speaking (Web Speech)...");
           document.getElementById("speakBtn").className = "btn btn-speaking";
         };
         u.onend = () => {
           updateStatus("Ready");
           document.getElementById("speakBtn").className = "btn btn-success";
         };
+        u.onerror = () => {
+          updateStatus("TTS error");
+          document.getElementById("speakBtn").className = "btn btn-success";
+        };
 
         window.speechSynthesis.speak(u);
+      }
+
+      async function speakWithEdge(text) {
+        stopAllSpeech();
+        updateStatus("Synthesizing (Edge TTS)...");
+
+        const speed = parseFloat(document.getElementById("speedSlider").value);
+        const voice = document.getElementById("edgeVoice").value;
+
+        try {
+          const resp = await fetch("/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text, speed, voice }),
+          });
+
+          if (!resp.ok) {
+            const data = await resp.json().catch(() => ({}));
+            throw new Error(data.error || "tts_failed");
+          }
+
+          const blob = await resp.blob();
+          cleanupAudioUrl();
+          ttsAudioUrl = URL.createObjectURL(blob);
+          ttsAudio = new Audio(ttsAudioUrl);
+
+          ttsAudio.onplay = () => {
+            updateStatus("Speaking (Edge TTS)...");
+            document.getElementById("speakBtn").className = "btn btn-speaking";
+          };
+          ttsAudio.onended = () => {
+            updateStatus("Ready");
+            document.getElementById("speakBtn").className = "btn btn-success";
+            cleanupAudioUrl();
+          };
+          ttsAudio.onerror = () => {
+            updateStatus("Edge TTS playback error");
+            document.getElementById("speakBtn").className = "btn btn-success";
+            cleanupAudioUrl();
+          };
+
+          await ttsAudio.play();
+        } catch (error) {
+          console.error("Edge TTS error:", error);
+          updateStatus("Edge TTS unavailable, fallback to Web Speech");
+          document.getElementById("speakBtn").className = "btn btn-success";
+          speakWithWebSpeech(text);
+        }
+      }
+
+      function speakText(text) {
+        if (!text) return;
+        const provider = document.getElementById("ttsProvider").value;
+        if (provider === "edge") {
+          speakWithEdge(text);
+          return;
+        }
+        speakWithWebSpeech(text);
       }
 
       async function translateText(text) {
@@ -163,41 +317,36 @@
           });
 
           const data = await resp.json();
-          const translation = data.translation;
+          const translation = data.translation || "";
 
           if (!translation) {
             updateStatus("Ready");
             return;
           }
 
-          // Chỉ hiển thị & lưu đoạn tiếng Anh mới nhất
           lastTranslation = translation;
           document.getElementById("outputText").textContent = translation;
           updateStatus("Ready");
 
-          // Đọc đúng đoạn mới đó, KHÔNG dính gì với đoạn cũ
           if (document.getElementById("autoSpeak").checked) {
             speakText(translation);
           }
-        } catch (err) {
-          console.error("Translate error:", err);
-          updateStatus("Ready");
+        } catch (error) {
+          console.error("Translate error:", error);
+          updateStatus("Translation error");
         }
       }
 
       function handleSpeak() {
         if (!lastTranslation) return;
-        // Bấm nút Speak -> chỉ đọc lại CHUNK tiếng Anh mới nhất
         speakText(lastTranslation);
       }
 
       function handleStop() {
-        window.speechSynthesis.cancel();
+        stopAllSpeech();
         updateStatus("Ready");
-        document.getElementById("speakBtn").className = "btn btn-success";
       }
 
-      // ================= Typing =================
       document.getElementById("inputText").addEventListener("input", (e) => {
         if (isFromVoice) return;
         const currentVi = e.target.value;
@@ -215,34 +364,33 @@
 
         updateStatus("Typing...");
         typingTimer = setTimeout(() => {
-          // Nếu người dùng gõ tiếng Anh -> đọc luôn tiếng Anh (không dịch)
           if (isEnglishSentence(trimmed)) {
             lastTranslation = trimmed;
             document.getElementById("outputText").textContent = trimmed;
-            // đọc đúng đoạn người ta đang gõ (chunk hiện tại)
-            speakText(trimmed);
-          } else {
-            // Người dùng gõ tiếng Việt
-            // Lấy phần mới thêm so với lần trước (suffix theo prefix chung)
-            const lcp = longestCommonPrefixLen(prevInputVi, currentVi);
-            let newVi = currentVi.slice(lcp).trim();
-            prevInputVi = currentVi;
-
-            // Nếu không xác định được phần mới (hoặc user sửa lung tung) -> fallback: dịch toàn bộ
-            if (!newVi) {
-              newVi = trimmed;
+            if (document.getElementById("autoSpeak").checked) {
+              speakText(trimmed);
             }
-
-            translateText(newVi);
+            return;
           }
-        }, 700);
+
+          let toTranslate = trimmed;
+          if (document.getElementById("continuous").checked) {
+            const lcp = longestCommonPrefixLen(prevInputVi, currentVi);
+            const onlyNew = currentVi.slice(lcp).trim();
+            if (onlyNew) {
+              toTranslate = onlyNew;
+            }
+          }
+
+          prevInputVi = currentVi;
+          translateText(toTranslate);
+        }, 650);
       });
 
-      // ================= Voice =================
       function initRecognition() {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) {
-          alert("Browser không hỗ trợ Web Speech API (hãy dùng Chrome).");
+          alert("Browser does not support Web Speech API. Use Chrome/Edge.");
           return null;
         }
 
@@ -253,29 +401,31 @@
 
         rec.onstart = () => {
           updateStatus("Listening...");
-          document.getElementById("voiceBtn").textContent = "⏹️ Stop Listening";
+          document.getElementById("voiceBtn").textContent = "Stop Listening";
+          document.getElementById("voiceBtn").classList.add("danger");
         };
 
         rec.onend = () => {
           if (isListening) {
             try {
               rec.start();
-            } catch (e) {
-              console.error("Restart error:", e);
+            } catch (error) {
+              console.error("Restart error:", error);
               isListening = false;
               updateStatus("Ready");
               document.getElementById("voiceBtn").textContent =
-                "🎤 Start Listening";
+                "Start Listening";
+              document.getElementById("voiceBtn").classList.remove("danger");
             }
           } else {
             updateStatus("Ready");
-            document.getElementById("voiceBtn").textContent =
-              "🎤 Start Listening";
+            document.getElementById("voiceBtn").textContent = "Start Listening";
+            document.getElementById("voiceBtn").classList.remove("danger");
           }
         };
 
         rec.onerror = (e) => {
-          console.error("WS error:", e);
+          console.error("Speech recognition error:", e);
         };
 
         rec.onresult = (e) => {
@@ -284,11 +434,11 @@
           for (let i = e.resultIndex; i < e.results.length; i++) {
             const res = e.results[i];
             const txt = res[0].transcript;
-
             if (res.isFinal) {
               const seg = txt.trim();
-              if (!seg) continue;
-              fullVoiceTranscript = (fullVoiceTranscript + " " + seg).trim();
+              if (seg) {
+                fullVoiceTranscript = (fullVoiceTranscript + " " + seg).trim();
+              }
             } else {
               interim += txt;
             }
@@ -296,9 +446,8 @@
 
           const display = (fullVoiceTranscript + " " + interim).trim();
           document.getElementById("detectedText").textContent =
-            display || "—";
+            display || "No speech yet.";
 
-          // sau mỗi result -> reset timer, nếu 1s không có result mới -> coi là ngưng câu
           if (voiceSilenceTimer) clearTimeout(voiceSilenceTimer);
           voiceSilenceTimer = setTimeout(onVoiceSilence, 500);
         };
@@ -306,7 +455,6 @@
         return rec;
       }
 
-      // User im khoảng 1s -> lấy phần mới so với lần trước
       function onVoiceSilence() {
         const newText = fullVoiceTranscript
           .slice(processedVoiceTranscript.length)
@@ -319,10 +467,8 @@
 
       function handleVoiceChunk(text) {
         const chunk = text.trim();
-        if (!chunk) return;
-        if (chunk.length < 2) return;
+        if (!chunk || chunk.length < 2) return;
 
-        // Đưa chunk vào textarea (không kích hoạt logic typing)
         isFromVoice = true;
         const inputEl = document.getElementById("inputText");
         inputEl.value = (inputEl.value + " " + chunk).trim();
@@ -331,14 +477,15 @@
         }, 50);
 
         if (isEnglishSentence(chunk)) {
-          // Nói tiếng Anh -> không dịch, đọc nguyên chunk này
           lastTranslation = chunk;
           document.getElementById("outputText").textContent = chunk;
-          speakText(chunk);
-        } else {
-          // Nói tiếng Việt -> dịch đúng chunk đó -> đọc chunk tiếng Anh
-          translateText(chunk);
+          if (document.getElementById("autoSpeak").checked) {
+            speakText(chunk);
+          }
+          return;
         }
+
+        translateText(chunk);
       }
 
       function toggleVoiceInput() {
@@ -349,29 +496,31 @@
 
         if (!isListening) {
           isListening = true;
-
           fullVoiceTranscript = "";
           processedVoiceTranscript = "";
           if (voiceSilenceTimer) {
             clearTimeout(voiceSilenceTimer);
             voiceSilenceTimer = null;
           }
-
-          document.getElementById("detectedText").textContent = "—";
+          document.getElementById("detectedText").textContent =
+            "No speech yet.";
           recognition.start();
-        } else {
-          isListening = false;
-          try {
-            recognition.stop();
-          } catch (e) {
-            console.error("Stop error:", e);
-          }
-          if (voiceSilenceTimer) {
-            clearTimeout(voiceSilenceTimer);
-            voiceSilenceTimer = null;
-          }
+          return;
+        }
+
+        isListening = false;
+        try {
+          recognition.stop();
+        } catch (error) {
+          console.error("Stop error:", error);
+        }
+        if (voiceSilenceTimer) {
+          clearTimeout(voiceSilenceTimer);
+          voiceSilenceTimer = null;
         }
       }
+
+      onProviderChange();
     </script>
   </body>
 </html>

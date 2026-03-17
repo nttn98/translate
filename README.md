@@ -1,6 +1,6 @@
-# Vietnamese to English Translator
+# My Translator (Flask Edition)
 
-Flask web application for translating Vietnamese to English with voice input and text-to-speech using **Groq API** (super fast!).
+Realtime Vietnamese to English translator with speech input and pluggable TTS providers, inspired by the project style of phuc-nt/my-translator.
 
 ## Setup
 
@@ -26,10 +26,10 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Configure API key in `.env` file:
+4. Configure your own Groq key in `.env`:
 
 ```
-GROQ_API_KEY=your_groq_api_key_here
+GROQ_API_KEY=your_own_key_here
 GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
@@ -43,17 +43,23 @@ python app.py
 
 6. Open browser: `http://localhost:5000`
 
-## ✨ Features
+## Features
 
-- ✅ Auto-translate after typing
-- ✅ Voice input (Vietnamese)
-- ✅ Text-to-speech (English)
-- ✅ Adjustable speech speed (0.5x - 2x)
-- ✅ Auto-speak mode
-- ✅ Continuous mode
-- ✅ **SUPER FAST** translation with Groq (280-560 tokens/sec)
+- Realtime translate while typing (chunk based for low latency)
+- Vietnamese microphone input (Web Speech API)
+- English narration with 2 providers:
+  - Web Speech (browser/local)
+  - Edge TTS (server-side neural voice)
+- Adjustable speech speed (0.5x - 2x)
+- Auto-speak mode
+- Continuous mode
+- Tabbed settings UI
 
-## 🤖 Recommended Models
+## Optional: Edge TTS setup
+
+Edge TTS is included in requirements. If you only want browser TTS, keep using provider "Web Speech" in app settings.
+
+## Recommended Groq models
 
 ### **llama-3.3-70b-versatile** (Default - Best quality)
 
@@ -69,9 +75,9 @@ python app.py
 
 To change model, edit `GROQ_MODEL` in `.env` file.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend:** Flask 3.0
 - **API:** Groq (OpenAI-compatible)
-- **Frontend:** Vanilla JavaScript
-- **Speech:** Web Speech API
+- **Frontend:** Vanilla JavaScript + tabbed settings UI
+- **Speech:** Web Speech API + Edge TTS

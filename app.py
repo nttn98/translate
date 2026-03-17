@@ -1,21 +1,60 @@
 import os
 import re
+import asyncio
 import traceback
 import requests
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from dotenv import load_dotenv
+
+try:
+    import edge_tts
+except Exception:
+    edge_tts = None
 
 load_dotenv()
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-GROQ_KEY = (os.getenv("GROQ_API_KEY") or "").strip() or None
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+
+def get_runtime_config() -> tuple[str | None, str]:
+    # Reload .env so key/model changes are picked up without stale values.
+    load_dotenv(override=True)
+    groq_key = (os.getenv("GROQ_API_KEY") or "").strip() or None
+    groq_model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+    return groq_key, groq_model
 
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    groq_key, groq_model = get_runtime_config()
+    return jsonify(
+        {
+            "ok": True,
+            "groq_configured": bool(groq_key),
+            "groq_model": groq_model,
+            "edge_tts_available": bool(edge_tts),
+        }
+    )
+
+
+def _to_edge_rate(speed: float) -> str:
+    safe_speed = max(0.5, min(2.0, speed))
+    percent = int(round((safe_speed - 1.0) * 100))
+    return f"{percent:+d}%"
+
+
+async def _synthesize_edge_tts(text: str, voice: str, rate: str) -> bytes:
+    communicate = edge_tts.Communicate(text=text, voice=voice, rate=rate)
+    audio_chunks = []
+    async for chunk in communicate.stream():
+        if chunk.get("type") == "audio":
+            audio_chunks.append(chunk.get("data", b""))
+    return b"".join(audio_chunks)
 
 
 def looks_like_vietnamese(text: str) -> bool:
@@ -90,6 +129,7 @@ def translate():
     try:
         data = request.get_json(force=True)
         text = (data.get("text") or "").strip()
+        groq_key, groq_model = get_runtime_config()
         if not text:
             return jsonify({"error": "no_text"}), 400
 
@@ -102,7 +142,7 @@ def translate():
         if not looks_like_vietnamese(text):
             return jsonify({"translation": ""}), 200
 
-        if GROQ_KEY:
+        if groq_key:
             try:
                 # MODEL CHỈ DỊCH VI → EN, KHÔNG LÀM GÌ KHÁC
                 system_prompt = (
@@ -117,7 +157,7 @@ def translate():
                 )
 
                 payload = {
-                    "model": GROQ_MODEL,
+                    "model": groq_model,
                     "messages": [
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": text},
@@ -129,7 +169,7 @@ def translate():
                 resp = requests.post(
                     "https://api.groq.com/openai/v1/chat/completions",
                     headers={
-                        "Authorization": f"Bearer {GROQ_KEY}",
+                        "Authorization": f"Bearer {groq_key}",
                         "Content-Type": "application/json",
                     },
                     json=payload,
@@ -153,6 +193,36 @@ def translate():
     except Exception:
         print("TRANSLATE unexpected:", traceback.format_exc())
         return jsonify({"translation": ""}), 200
+
+
+@app.route("/tts", methods=["POST"])
+def tts():
+    try:
+        if not edge_tts:
+            return jsonify({"error": "edge_tts_not_installed"}), 501
+
+        data = request.get_json(force=True)
+        text = (data.get("text") or "").strip()
+        voice = (data.get("voice") or "en-US-AriaNeural").strip()
+        speed = float(data.get("speed", 1.0))
+
+        if not text:
+            return jsonify({"error": "no_text"}), 400
+
+        rate = _to_edge_rate(speed)
+        audio_data = asyncio.run(_synthesize_edge_tts(text=text, voice=voice, rate=rate))
+
+        if not audio_data:
+            return jsonify({"error": "empty_audio"}), 500
+
+        return Response(audio_data, mimetype="audio/mpeg")
+
+    except Exception as exc:
+        print("TTS unexpected:", traceback.format_exc())
+        message = str(exc)
+        if "403" in message:
+            return jsonify({"error": "edge_tts_blocked"}), 503
+        return jsonify({"error": "tts_failed"}), 500
 
 
 if __name__ == "__main__":
